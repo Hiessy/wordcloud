@@ -1,7 +1,7 @@
 package com.hiesso.service.unit;
 
-import com.hiesso.service.StorageService;
-import com.hiesso.service.WordServiceImpl;
+import com.hiesso.service.Storage;
+import com.hiesso.service.WordImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,29 +13,32 @@ import java.io.IOException;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = WordServiceImpl.class)
+@SpringBootTest(classes = WordImpl.class)
 public class WordCountTest {
 
     public static final String SMALL = "small";
     public static final String RED_BLUE_RED = "red blue red brown white white black red brown pink";
     @Autowired
-    WordServiceImpl wordService;
+    WordImpl word;
 
     @MockBean
-    StorageService storageService;
+    Storage storage;
 
     @Test
     public void testCountUniqueWords() throws IOException {
-        when(storageService.readFile(SMALL)).thenReturn(RED_BLUE_RED);
-        Map<String, Long> wordCount = wordService.count(SMALL);
+        when(storage.readFile(SMALL)).thenReturn(RED_BLUE_RED);
+        Map<String, Long> wordCount = word.count(SMALL);
 
-        assertEquals(2, wordCount.size());
-        assertEquals(Long.valueOf("2"), wordCount.get("red"));
+        assertEquals(6, wordCount.size());
+        assertEquals(Long.valueOf("3"), wordCount.get("red"));
         assertEquals(Long.valueOf("1"), wordCount.get("blue"));
+
+
     }
 
 }
