@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 
-public interface StorageService {
+public interface Storage {
     String readFile(String file) throws IOException;
     List<String> saveFile(Stream<MultipartFile> files) throws IOException;
     void deleteFile(String fileName) throws IOException;

@@ -1,6 +1,6 @@
 package com.hiesso.service.functional;
 
-import com.hiesso.service.StorageServiceImpl;
+import com.hiesso.service.StorageImpl;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = StorageServiceImpl.class)
+@SpringBootTest(classes = StorageImpl.class)
 public class StorageServiceTest {
 
     public static final String SMALL = "small";
@@ -41,20 +41,20 @@ public class StorageServiceTest {
     public static final String HUGE = "huge";
 
     @Autowired
-    private StorageServiceImpl storageService;
+    private StorageImpl storage;
 
     private String testPath = Paths.get("").toAbsolutePath() + "\\src\\test\\resources\\test_data";
 
     @After
     public void teardown() {
         Stream.of(Objects.requireNonNull(
-                storageService.getAllFiles().listFiles()))
+                storage.getAllFiles().listFiles()))
                 .forEach(deleteFile);
     }
 
     @Test
     public void testWriteFiles() throws IOException, NoSuchAlgorithmException {
-        List<String> result = storageService.saveFile(createMultipartFile(BIG + "," + SMALL).stream());
+        List<String> result = storage.saveFile(createMultipartFile(BIG + "," + SMALL).stream());
         Assert.assertFalse(result.contains(ERROR));
         Assert.assertTrue(getChecksumFile(SMALL));
         Assert.assertTrue(getChecksumFile(BIG));
@@ -62,28 +62,28 @@ public class StorageServiceTest {
 
     @Test
     public void testReadFile() throws IOException {
-        storageService.saveFile(createMultipartFile(SMALL).stream());
-        String fs = storageService.readFile(SMALL);
+        storage.saveFile(createMultipartFile(SMALL).stream());
+        String fs = storage.readFile(SMALL);
         Assert.assertEquals(91, fs.length());
     }
 
     @Test
     public void testDeleteFile() throws IOException {
-        storageService.saveFile(createMultipartFile(HUGE).stream());
-        storageService.deleteFile(HUGE);
-        assertThrows(NoSuchFileException.class, () -> storageService.deleteFile(HUGE));
+        storage.saveFile(createMultipartFile(HUGE).stream());
+        storage.deleteFile(HUGE);
+        assertThrows(NoSuchFileException.class, () -> storage.deleteFile(HUGE));
     }
 
     @Test
     public void testGetAllFile() throws IOException {
-        storageService.saveFile(createMultipartFile(HUGE + "," + BIG).stream());
-        assertEquals(2, Objects.requireNonNull(storageService.getAllFiles().listFiles()).length);
+        storage.saveFile(createMultipartFile(HUGE + "," + BIG).stream());
+        assertEquals(2, Objects.requireNonNull(storage.getAllFiles().listFiles()).length);
     }
 
     private boolean getChecksumFile(String fileName) throws NoSuchAlgorithmException, IOException {
         MessageDigest md = MessageDigest.getInstance(MD5);
 
-        byte[] storageByte = getBytes(fileName, storageService.getPath());
+        byte[] storageByte = getBytes(fileName, storage.getPath());
         byte[] testByte = getBytes(fileName, testPath);
 
         return Arrays.equals(md.digest(testByte), md.digest(storageByte));
@@ -111,7 +111,7 @@ public class StorageServiceTest {
 
     private Consumer<File> deleteFile = file -> {
         try {
-            storageService.deleteFile(file.getName());
+            storage.deleteFile(file.getName());
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -4,7 +4,10 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,17 +19,13 @@ import java.util.stream.Stream;
 import static java.nio.file.Files.delete;
 
 @Service
-public class StorageServiceImpl implements StorageService {
+public class StorageImpl implements Storage {
 
     public static final String UPLOADED_FOLDER = "upload";
     public static final Charset CHARSET = Charset.defaultCharset();
     private String path;
 
-    public String getPath() {
-        return path;
-    }
-
-    public StorageServiceImpl() {
+    public StorageImpl() {
         path = Paths.get("").toAbsolutePath().toString()
                 .concat("\\" + UPLOADED_FOLDER) + "\\";
         File directory = new File(path);
@@ -58,14 +57,11 @@ public class StorageServiceImpl implements StorageService {
         return Paths.get(path).toFile();
     }
 
-
-    public String getStringFromInput(InputStream inputStream) throws IOException {
-        return IOUtils.toString(inputStream, CHARSET);
+    public String getPath() {
+        return path;
     }
 
-    //will overwrite any file with same name
     private Function<MultipartFile, String> saveFile = file -> {
-
         String fileName = file.getOriginalFilename();
         try {
             file.transferTo(new File(path + fileName));

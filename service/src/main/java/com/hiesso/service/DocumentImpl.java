@@ -15,23 +15,27 @@ import static com.hiesso.functions.MapSupplier.byValue;
 import static com.hiesso.functions.StringFilter.lengthSmallerThanThree;
 
 @Service
-public class WordImpl implements Word {
+public class DocumentImpl implements Document {
+
     static String DELIMITERS = "[,;:.\\s\"]";
 
     @Autowired
     Storage storage;
+
     @Override
-    public Map<String, Long> count(String fileName) throws IOException {
+    public Map<String, Long> countWords(String fileName) throws IOException {
         String document = storage.readFile(fileName);
 
         Stream<String> documentStream = Stream.of(document.toLowerCase().split(DELIMITERS)).map(removeSpecialCharacter);
 
-        return documentStream
+        Map<String, Long> objectStream = documentStream
                 .filter(lengthSmallerThanThree)
                 .collect(createMapCountingString)
                 .entrySet().stream()
                 .sorted(orderByValue.reversed())
                 .collect(byValue);
+
+        return objectStream;
     }
 
 }
