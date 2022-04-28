@@ -1,6 +1,7 @@
 package com.hiesso.controller;
 
-import com.hiesso.service.WordService;
+import com.hiesso.service.Document;
+import com.hiesso.service.Storage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,11 @@ import java.util.Map;
 public class WordCloud {
 
     @Autowired
-    WordService wordService;
+    Storage storage;
+
+    @Autowired
+    Document document;
+
     /**
      * Endpoint for upload multiple files for processing.
      *
@@ -27,21 +32,23 @@ public class WordCloud {
      * @throws IOException
      */
     @GetMapping("/word/cloud")
-    public ResponseEntity<Object> getWorldCloud(@RequestParam(value="files") List<String> files) {
-        Map<String, Object> response = new HashMap<>();
+    public ResponseEntity<Object> getWorldCloud(@RequestParam(value = "files") List<String> files) {
+        Map<String, Object> response = generateResponse(files);
+        return ResponseEntity.ok(response);
+    }
 
+    private Map<String, Object> generateResponse(List<String> files) {
+        Map<String, Object> response = new HashMap<>();
         files.forEach(file -> {
             try {
                 response.put(
-                        file, wordService.count(file));
+                        file, document.countWords(storage.readFile(file)));
             } catch (IOException e) {
                 response.put(
                         file, e.getStackTrace());
             }
         });
 
-        return ResponseEntity.ok(response);
+        return response;
     }
-
-
 }

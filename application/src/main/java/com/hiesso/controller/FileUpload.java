@@ -1,7 +1,7 @@
 package com.hiesso.controller;
 
 
-import com.hiesso.service.StorageService;
+import com.hiesso.service.Storage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class FileUpload {
 
     @Autowired
-    StorageService storageService;
+    Storage storageService;
 
     /**
      * Endpoint for upload multiple files for processing.

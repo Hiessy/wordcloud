@@ -1,7 +1,6 @@
 package com.hiesso.service;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,23 +18,18 @@ public class DocumentImpl implements Document {
 
     static String DELIMITERS = "[,;:.\\s\"]";
 
-    @Autowired
-    Storage storage;
 
     @Override
-    public Map<String, Long> countWords(String fileName) throws IOException {
-        String document = storage.readFile(fileName);
+    public Map<String, Long> countWords(String document) throws IOException {
 
         Stream<String> documentStream = Stream.of(document.toLowerCase().split(DELIMITERS)).map(removeSpecialCharacter);
 
-        Map<String, Long> objectStream = documentStream
+        return documentStream
                 .filter(lengthSmallerThanThree)
                 .collect(createMapCountingString)
                 .entrySet().stream()
                 .sorted(orderByValue.reversed())
                 .collect(byValue);
-
-        return objectStream;
     }
 
 }
